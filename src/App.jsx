@@ -2393,7 +2393,7 @@ function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffR
   // Helper: normalize name for fuzzy matching
   const normName=(n)=>{
     if(!n)return"";
-    return n.trim().replace(/^(د\.|أ\.د\.|أ\.م\.|م\.|م\.د\.|م\.م\.|Prof\.|Dr\.|Asst\.\s*Prof\.|Assoc\.\s*Prof\.|Mr\.|Mrs\.|Ms\.|Eng\.|Lect\.)\s*/gi,"").replace(/\s+/g," ").trim().toLowerCase();
+    return n.trim().replace(/^(د\.?|أ\.د\.?|أ\.م\.د\.?|أ\.م\.?|م\.د\.?|م\.م\.?|م\.|أ\.|السيد|السيدة|الأستاذ|Prof\.|Dr\.|Asst\.\s*Prof\.|Assoc\.\s*Prof\.|Mr\.|Mrs\.|Ms\.|Eng\.|Lect\.)\s*/gi,"").replace(/\s+/g," ").trim().toLowerCase();
   };
   const fuzzyMatch=(a,b)=>{
     const na=normName(a),nb=normName(b);
@@ -2417,14 +2417,15 @@ function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffR
     // Honorifics that ONLY indicate the start of a new person (not mid-name initials)
     // Note: bare "م." / "أ." are excluded — they collide with middle initials.
     const titleRe=/(?:أ\.د\.|أ\.م\.د\.|أ\.م\.|م\.د\.|م\.م\.|Prof\.|Dr\.|Asst\.\s*Prof\.|Assoc\.\s*Prof\.|Lect\.)/g;
-    const titleStripRe=/^(?:د\.|أ\.د\.|أ\.م\.د\.|أ\.م\.|م\.د\.|م\.م\.|م\.|أ\.|Prof\.|Dr\.|Asst\.\s*Prof\.|Assoc\.\s*Prof\.|Mr\.|Mrs\.|Ms\.|Eng\.|Lect\.)\s*/gi;
+    const titleStripRe=/^(?:د\.?|أ\.د\.?|أ\.م\.د\.?|أ\.م\.?|م\.د\.?|م\.م\.?|م\.|أ\.|السيد|السيدة|الأستاذ|Prof\.|Dr\.|Asst\.\s*Prof\.|Assoc\.\s*Prof\.|Mr\.|Mrs\.|Ms\.|Eng\.|Lect\.)\s*/gi;
     let s=String(str);
-    // 1) Normalise hard separators to a single delimiter
+    // 1) Normalise hard separators to a single delimiter (commas, semicolons, slashes, dashes, newlines, "and")
+    s=s.replace(/\s+[-–—]\s+/g,"|");
     s=s.replace(/[,،؛;\/&+\n]+|\s+and\s+/gi,"|");
     // 2) Arabic "و" linker — only when followed by a clear honorific (avoids splitting "أبو ...")
-    s=s.replace(/\s+و(?=\s*(?:د\.|أ\.د\.|أ\.م\.|م\.د\.|م\.م\.|Dr\.|Prof\.))/g,"|");
+    s=s.replace(/\s+و(?=\s*(?:د\.?|أ\.د\.?|أ\.م\.?|م\.د\.?|م\.م\.?|السيد|السيدة|الأستاذ|Dr\.|Prof\.))/g,"|");
     // 3) Insert delimiter before honorifics appearing mid-string (preceded by whitespace)
-    s=s.replace(/\s(?=(?:د\.|أ\.د\.|أ\.م\.د\.|أ\.م\.|م\.د\.|م\.م\.|Dr\.|Prof\.))/g,"|");
+    s=s.replace(/\s(?=(?:د\.|أ\.د\.?|أ\.م\.د\.?|أ\.م\.?|م\.د\.?|م\.م\.?|السيد\s|السيدة\s|الأستاذ\s|Dr\.|Prof\.))/g,"|");
     // 4) Split, strip titles, drop short/garbage tokens
     return s.split("|")
       .map(n=>n.trim().replace(/^و\s*/,"").trim())
@@ -2607,7 +2608,7 @@ function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffR
     if(!name)return"";
     let n=name.trim();
     // Remove common titles/degrees
-    n=n.replace(/^(د\.|أ\.د\.|أ\.م\.|م\.|م\.د\.|م\.م\.|Prof\.|Dr\.|Asst\.\s*Prof\.|Assoc\.\s*Prof\.|Mr\.|Mrs\.|Ms\.|Eng\.|Lect\.)\s*/gi,"");
+    n=n.replace(/^(د\.?|أ\.د\.?|أ\.م\.د\.?|أ\.م\.?|م\.د\.?|م\.م\.?|م\.|أ\.|السيد|السيدة|الأستاذ|Prof\.|Dr\.|Asst\.\s*Prof\.|Assoc\.\s*Prof\.|Mr\.|Mrs\.|Ms\.|Eng\.|Lect\.)\s*/gi,"");
     // Remove extra spaces
     n=n.replace(/\s+/g," ").trim().toLowerCase();
     return n;
