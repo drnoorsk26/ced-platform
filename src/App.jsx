@@ -405,7 +405,7 @@ const SAMPLE_TRAINERS = [];
 const SAMPLE_CORR = [];
 
 // ─── STORAGE ──────────────────────────────────────────────────────────
-const K = {session:"cedp-session",plans:"cedp-plans",init:"cedp-init",trainers:"cedp-trainers",corr:"cedp-corr",reports:"cedp-reports",users:"cedp-users",config:"cedp-config",notes:"cedp-notes",audit:"cedp-audit",recovery:"cedp-recovery",roster:"cedp-roster",directives:"cedp-directives",staffMerges:"cedp-staff-merges"};
+const K = {session:"cedp-session",plans:"cedp-plans",init:"cedp-init",trainers:"cedp-trainers",corr:"cedp-corr",reports:"cedp-reports",users:"cedp-users",config:"cedp-config",notes:"cedp-notes",audit:"cedp-audit",recovery:"cedp-recovery",roster:"cedp-roster",directives:"cedp-directives",staffMerges:"cedp-staff-merges",staffHidden:"cedp-staff-hidden"};
 // Storage functions — use localStorage for GitHub Pages compatibility
 async function sG(k,fb){try{const r=localStorage.getItem(k);return r?JSON.parse(r):fb;}catch{return fb;}}
 async function sS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){console.error(e);}}
@@ -699,6 +699,7 @@ export default function App(){
   const [reports,setReports]=useState([]);
   const [staffRoster,setStaffRoster]=useState([]);
   const [staffMerges,setStaffMerges]=useState([]);
+  const [staffHidden,setStaffHidden]=useState([]);
   const [directives,setDirectives]=useState([]);
   const [users,setUsers]=useState(DEFAULT_USERS);
   const [config,setConfig]=useState({lang:"en",platformName:"",platformSub:"",customLogo:""});
@@ -763,6 +764,7 @@ export default function App(){
     setReports(await sG(K.reports,[]));
     setStaffRoster(await sG(K.roster,[]));
     setStaffMerges(await sG(K.staffMerges,[]));
+    setStaffHidden(await sG(K.staffHidden,[]));
     setDirectives(await sG(K.directives,[]));
     setConfig(await sG(K.config,{lang:"en",platformName:"",platformSub:"",customLogo:""}));
     setStickyNotes(await sG(K.notes,[]));
@@ -773,7 +775,7 @@ export default function App(){
   })();},[]);
 
   const sv=(k,setter)=>async v=>{setter(v);await sS(k,v);};
-  const savePlans=sv(K.plans,setPlans),saveInits=sv(K.init,setInits),saveTrainers=sv(K.trainers,setTrainers),saveCorr=sv(K.corr,setCorr),saveReports=sv(K.reports,setReports),saveRoster=sv(K.roster,setStaffRoster),saveStaffMerges=sv(K.staffMerges,setStaffMerges),saveDirectives=sv(K.directives,setDirectives),saveUsers=sv(K.users,setUsers),saveConfig=sv(K.config,setConfig),saveNotes=sv(K.notes,setStickyNotes);
+  const savePlans=sv(K.plans,setPlans),saveInits=sv(K.init,setInits),saveTrainers=sv(K.trainers,setTrainers),saveCorr=sv(K.corr,setCorr),saveReports=sv(K.reports,setReports),saveRoster=sv(K.roster,setStaffRoster),saveStaffMerges=sv(K.staffMerges,setStaffMerges),saveStaffHidden=sv(K.staffHidden,setStaffHidden),saveDirectives=sv(K.directives,setDirectives),saveUsers=sv(K.users,setUsers),saveConfig=sv(K.config,setConfig),saveNotes=sv(K.notes,setStickyNotes);
 
   const audit=async(action,details)=>{const updated=await addAuditEntry(action,user,details);setAuditLog(updated);};
 
@@ -817,6 +819,7 @@ export default function App(){
       setReports(await sG(K.reports,[]));
       setStaffRoster(await sG(K.roster,[]));
     setStaffMerges(await sG(K.staffMerges,[]));
+    setStaffHidden(await sG(K.staffHidden,[]));
       setDirectives(await sG(K.directives,[]));
       setConfig(await sG(K.config,{lang:"en",platformName:"",platformSub:"",customLogo:""}));
       setStickyNotes(await sG(K.notes,[]));
@@ -934,7 +937,7 @@ export default function App(){
           {page==="initiatives"&&<InitiativesPage t={t} inits={inits} saveInits={saveInits} isAdmin={isAdmin} trainers={trainers} logoSrc={logoSrc} pName={pName} pSub={pSub} COLLEGES={COLLEGES}/>}
           {page==="directives"&&<DirectivesPage t={t} directives={directives} saveDirectives={saveDirectives} allActs={allActs} inits={inits} saveInits={saveInits} plans={plans} savePlans={savePlans} COLLEGES={COLLEGES} isAdmin={isAdmin} logoSrc={logoSrc} pName={pName}/>}
           {page==="trainers"&&<TrainersPage t={t} trainers={trainers} saveTrainers={saveTrainers} isAdmin={isAdmin} canEdit={canEdit} COLLEGES={COLLEGES} allActs={allActs} logoSrc={logoSrc} pName={pName}/>}
-          {page==="staff"&&<StaffPage t={t} allActs={allActs} corr={corr} trainers={trainers} saveTrainers={saveTrainers} COLLEGES={COLLEGES} isAdmin={isAdmin} staffRoster={staffRoster} saveRoster={saveRoster} staffMerges={staffMerges} saveStaffMerges={saveStaffMerges} logoSrc={logoSrc} pName={pName} reports={reports}/>}
+          {page==="staff"&&<StaffPage t={t} allActs={allActs} corr={corr} trainers={trainers} saveTrainers={saveTrainers} COLLEGES={COLLEGES} isAdmin={isAdmin} staffRoster={staffRoster} saveRoster={saveRoster} staffMerges={staffMerges} saveStaffMerges={saveStaffMerges} staffHidden={staffHidden} saveStaffHidden={saveStaffHidden} logoSrc={logoSrc} pName={pName} reports={reports}/>}
           {page==="reports"&&<ReportsPage t={t} reports={reports} saveReports={saveReports} allActs={allActs} isAdmin={isAdmin} canEdit={canEdit} logoSrc={logoSrc} pName={pName} COLLEGES={COLLEGES} plans={plans} savePlans={savePlans} inits={inits} saveInits={saveInits}/>}
           {page==="correspondence"&&<CorrPage t={t} corr={corr} saveCorr={saveCorr} isAdmin={isAdmin} canEdit={canEdit} COLLEGES={COLLEGES}/>}
           {page==="analytics"&&<AnalyticsPage t={t} allActs={allActs} plans={plans} isRtl={isRtl} COLLEGES={COLLEGES} reports={reports} logoSrc={logoSrc} pName={pName}/>}
@@ -2363,8 +2366,15 @@ function DirectiveForm({t,onSave,onCancel,COLLEGES,initial}){
 }
 
 // ─── STAFF PAGE ──────────────────────────────────────────────────────
-function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffRoster,saveRoster,staffMerges,saveStaffMerges,logoSrc,pName,reports}){
+function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffRoster,saveRoster,staffMerges,saveStaffMerges,staffHidden,saveStaffHidden,logoSrc,pName,reports}){
   const [mergeFor,setMergeFor]=useState(null);
+  const [showHidden,setShowHidden]=useState(false);
+  const isHidden=(name)=>(staffHidden||[]).includes(name);
+  const toggleHidden=(name)=>{
+    const list=staffHidden||[];
+    if(list.includes(name))saveStaffHidden(list.filter(x=>x!==name));
+    else saveStaffHidden([...list,name]);
+  };
   // Build alias→canonical lookup from staffMerges
   const aliasMap=useMemo(()=>{
     const m={};
@@ -2526,6 +2536,9 @@ function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffR
 
   const staffList=useMemo(()=>{
     return Object.values(staffMap).filter(s=>{
+      const hidden=isHidden(s.name);
+      if(showHidden){if(!hidden)return false;}
+      else if(hidden)return false;
       if(fCollege!=="All"&&s.college!==fCollege)return false;
       if(fStatus==="active"&&s.activities.length===0)return false;
       if(fStatus==="participated"&&s.attendedActivities.length===0)return false;
@@ -2534,7 +2547,7 @@ function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffR
       if(fSearch){const q=fSearch.toLowerCase();if(!s.name.toLowerCase().includes(q)&&!s.college.toLowerCase().includes(q)&&!(s.title||"").toLowerCase().includes(q))return false;}
       return true;
     }).sort((a,b)=>b.activities.length-a.activities.length);
-  },[staffMap,fCollege,fSearch,fStatus]);
+  },[staffMap,fCollege,fSearch,fStatus,staffHidden,showHidden]);
 
   const saveLetter=(staffName,letter)=>{
     const existing=trainers.find(tr=>tr.name===staffName);
@@ -2697,7 +2710,9 @@ function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffR
     setTimeout(()=>setImportMsg(""),3000);
   };
 
-  const totalStaff=Object.keys(staffMap).length;const activeCount=Object.values(staffMap).filter(s=>s.activities.length>0).length;const inactiveCount=totalStaff-activeCount;
+  const visibleStaff=Object.values(staffMap).filter(s=>!isHidden(s.name));
+  const totalStaff=visibleStaff.length;const activeCount=visibleStaff.filter(s=>s.activities.length>0).length;const inactiveCount=totalStaff-activeCount;
+  const hiddenCount=(staffHidden||[]).length;
 
   const exportStaffExcel=()=>{
     const wb=XLSX.utils.book_new();
@@ -2743,6 +2758,7 @@ function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffR
         <span style={{fontSize:11,padding:"4px 10px",borderRadius:8,background:"#d5f5e3",color:"#196f3d",fontWeight:600}}>✅ {activeCount} active</span>
         <span style={{fontSize:11,padding:"4px 10px",borderRadius:8,background:inactiveCount>0?"#fdedec":"#f5f5f5",color:inactiveCount>0?"#c0392b":"#888",fontWeight:600}}>⚠️ {inactiveCount} no activity</span>
         {(staffRoster||[]).length>0&&<span style={{fontSize:11,padding:"4px 10px",borderRadius:8,background:"#f0e6f6",color:"#6c3483"}}>📋 {(staffRoster||[]).length} from roster</span>}
+        {hiddenCount>0&&<button onClick={()=>setShowHidden(!showHidden)} style={{fontSize:11,padding:"4px 10px",borderRadius:8,background:showHidden?"#5d6d7e":"#f5f5f5",color:showHidden?"#fff":"#5d6d7e",fontWeight:600,border:"none",cursor:"pointer"}}>{showHidden?"👁 Showing hidden":"🙈"} {hiddenCount} hidden{showHidden?" — click to hide":" — click to show"}</button>}
       </div>
 
       {/* FILTERS */}
@@ -2809,6 +2825,7 @@ function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffR
                     </div>
                   </div>
                   {isAdmin&&<button onClick={()=>setMergeFor(s.name)} style={{...btnI,padding:"2px 6px",fontSize:11,color:"#2980b9"}} title="Merge into another staff">🔗</button>}
+                  {isAdmin&&<button onClick={()=>toggleHidden(s.name)} style={{...btnI,padding:"2px 6px",fontSize:11}} title={isHidden(s.name)?"Unhide (show on page)":"Hide from page (e.g. not actually a college staff member)"}>{isHidden(s.name)?"👁":"🙈"}</button>}
                   {isAdmin&&s.fromRoster&&<button onClick={()=>removeFromRoster(s.name)} style={{...btnI,padding:2}} title="Remove"><Ic n="trash" s={12} c="#e74c3c"/></button>}
                 </div>
                 {!inactive&&<>
