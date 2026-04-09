@@ -2414,7 +2414,16 @@ function StaffPage({t,allActs,corr,trainers,saveTrainers,COLLEGES,isAdmin,staffR
   // Split multi-presenter string into individual names
   const splitPresenters=(str)=>{
     if(!str)return[];
-    return str.split(/[,،؛;\/&]+|\s+و\s+|\s+and\s+/i).map(n=>n.trim()).filter(n=>n.length>1);
+    // Honorific titles (Arabic + English) that mark the start of a new name
+    const titleRe=/(?:د\.|أ\.د\.|أ\.م\.د\.|أ\.م\.|م\.د\.|م\.م\.|م\.|Prof\.|Dr\.|Asst\.\s*Prof\.|Assoc\.\s*Prof\.|Mr\.|Mrs\.|Ms\.|Eng\.|Lect\.)/g;
+    let s=String(str);
+    // 1) Normalise common separators to a single delimiter
+    s=s.replace(/[,،؛;\/&+\n]+|\s+and\s+/gi,"|");
+    // 2) Arabic "و" linker — handle both "أحمد و علي" and "أحمد ود. علي"
+    s=s.replace(/\s+و(?=\s|د\.|أ\.|م\.|Dr\.|Prof\.)/g,"|");
+    // 3) Insert a delimiter before any honorific that appears after the first character
+    s=s.replace(titleRe,(m,off)=>off>0?"|"+m:m);
+    return s.split("|").map(n=>n.trim().replace(/^و\s*/,"").trim()).filter(n=>n.length>1);
   };
 
   // Build staff data: split presenters + track attendance
